@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body style="margin: 0">
+<canvas id="myCanvas"></canvas>
+
+</body>
+
+<script src="js/pixi.js"></script>
+<script src="js/honeycomb.min.js"></script>
+<script src="js/EventEmitter.js"></script>
+
+
+<script>
+    function TouchCaster (el) {
+        this.el = el
+        this.bind()
+        this.down = false
+        this.move = false
+    }
+
+    TouchCaster.prototype.bind = function () {
+        this.el.addEventListener('mousedown', this.onTouchDown)
+        this.el.addEventListener('mousemove', this.onTouchMove)
+        this.el.addEventListener('mouseup', this.onTouchUp)
+    }
+
+    TouchCaster.prototype.onTouchDown = function (evt) {
+        console.log(evt)
+        this.move = false
+        this.down = true
+    }
+
+    TouchCaster.prototype.onTouchMove = function (evt) {
+        if (this.down) {
+            this.move = true
+            bus.emit('move', evt)
+        }
+    }
+
+    TouchCaster.prototype.onTouchUp = function (evt) {
+        this.down = false
+        if (!this.move) {
+            bus.emit('click', evt)
+        }
+    }
+
+</script>
+
+<script>
+    const bus = new EventEmitter()
+
+    let app = new PIXI.Application({
+        transparent: true,
+        view: document.getElementById('myCanvas')
+    })
+    document.body.appendChild(app.view)
+
+    const Hex = Honeycomb.extendHex({size: 10})
+    const Grid = Honeycomb.defineGrid(Hex)
+
+    let graphics = new PIXI.Graphics()
+
+    let grid = function (size) {
+
+        const hsize = Math.floor(size / 2)
+
+        let grid = Grid.triangle({start: Hex(0, 0), size, direction: 1})
+        let grid1 = Grid.triangle({start: Hex(-size, -1), size, direction: 5})
+        let grid2 = Grid.triangle({start: Hex(-size + 1, 0), size, direction: 1})
+        let grid3 = Grid.triangle({start: Hex(-Math.floor((size - 1) / 2) - size, -size), size, direction: 5})
+        let grid4 = Grid.triangle({start: Hex(-hsize, -size + 1), size, direction: 1})
+        let grid5 = Grid.triangle({start: Hex(-Math.floor((size + 1) / 2), -size), size, direction: 5})
+
+        return grid.concat(grid1).concat(grid2).concat(grid3).concat(grid4).concat(grid5)
+    }(50)
+
+    const caster = new TouchCaster(app.view)
+
+    let x = 0, y = 0, zoom = 1
+
+    //let color = PIXI.utils.rgb2hex([Math.random(), Math.random(), Math.random()])
+    grid.forEach(hex => draw(hex, 0x00ff00, zoom))
+
+    graphics.setTransform(x, y, zoom, zoom)
+
+    app.stage.addChild(graphics)
+
+    bus.on('move', function (evt) {
+        x += evt.movementX
+        y += evt.movementY
+        graphics.setTransform(x, y, zoom, zoom)
+    })
+
+    bus.on('click', function (evt) {
+        //todo
+        const hex = Grid.pointToHex((evt.pageX - x) / zoom, (evt.pageY - y) / zoom)
+        draw(hex, 0, zoom)
+
+        setTimeout(() => {
+            draw(hex, 0x00ff00, zoom)
+        }, 1000)
+    })
+
+    document.body.addEventListener('keyup', function (evt) {
+        if (evt.key === '+') {
+            zoom *= 1.05
+            x = (x - app.view.width / 2) * 1.05 + app.view.width / 2
+            y = (y - app.view.height / 2) * 1.05 + app.view.height / 2
+        }
+        if (evt.key === '-') {
+            zoom /= 1.05
+            x = (x - app.view.width / 2) / 1.05 + app.view.width / 2
+            y = (y - app.view.height / 2) / 1.05 + app.view.height / 2
+        }
+        graphics.setTransform(x, y, zoom, zoom)
+    })
+
+    function draw (hex, color, zoom) {
+        // let mod = false
+        // if (!hex.color) {
+        //     hex.color = PIXI.utils.rgb2hex([Math.random(), Math.random(), Math.random()])
+        //     mod = true
+        // }
+        //
+        // if (Math.random() < 0.002) {
+        //     mod = true
+        // }
+        //
+        // if (!mod) {
+        //     return
+        // }
+
+        //hex.color = PIXI.utils.rgb2hex([Math.random(), Math.random(), Math.random()])
+
+        const point = hex.toPoint()
+        const corners = hex.corners().map(corner => corner.add(point))
+
+        let path = corners.reduce((arr, c) => {
+            arr.push(c.x, c.y)
+            return arr
+        }, [])
+        path.push(corners[0].x, corners[0].y)
+
+        //if (zoom > 1) {
+        graphics.lineStyle(1 / zoom, 0x999999)
+        //}
+
+        //graphics.beginFill(hex.color)
+        graphics.beginFill(color)
+        graphics.drawShape(new PIXI.Polygon(path))
+        graphics.endFill()
+        //graphics.setTransform(x, y, zoom, zoom)
+    }
+</script>
+
+</html>
