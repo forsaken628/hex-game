@@ -1,9 +1,9 @@
-import {Application, Graphics, Polygon} from './libs/pixi'
-import {defineGrid, extendHex} from './libs/honeycomb.min'
+import { Application, Graphics, Polygon } from './libs/pixi'
+import { defineGrid, extendHex } from './libs/honeycomb.min'
 
-const EventEmitter = require('./libs/EventEmitter');
+const EventEmitter = require('./libs/EventEmitter')
 
-function TouchCaster(el) {
+function TouchCaster (el) {
     this.el = el
     this.down = false
     this.start = {}
@@ -57,7 +57,7 @@ const bus = new EventEmitter()
  * 游戏主函数
  */
 export default class Main {
-    constructor() {
+    constructor () {
         this.app = new Application({
             width: canvas.width,
             height: canvas.height,
@@ -104,7 +104,6 @@ export default class Main {
             }, 1000)
         })
 
-
 // document.body.addEventListener('keyup', function (evt) {
 //     if (evt.key === '+') {
 //         zoom *= 1.05
@@ -119,12 +118,11 @@ export default class Main {
 //     graphics.setTransform(x, y, zoom, zoom)
 // })
 
-        const interaction = this.app.renderer.plugins.interaction;
+        const interaction = this.app.renderer.plugins.interaction
 
         interaction.on('click', function (evt) {
             console.log(evt)
         })
-
 
 //
 // // interactionManager.on('pointerdown',function (evt) {
@@ -143,16 +141,15 @@ export default class Main {
 //     console.log(evt)
 // })
 
-
     }
 
-    onMove(offsetX, offsetY) {
+    onMove (offsetX, offsetY) {
         this.camera.x += offsetX
         this.camera.y += offsetY
         this.graphics.setTransform(this.camera.x, this.camera.y, this.camera.zoom, this.camera.zoom)
     }
 
-    draw(hex, color) {
+    draw (hex, color) {
         // let mod = false
         // if (!hex.color) {
         //     hex.color = PIXI.utils.rgb2hex([Math.random(), Math.random(), Math.random()])
@@ -189,7 +186,7 @@ export default class Main {
         //graphics.setTransform(x, y, zoom, zoom)
     }
 
-    gridInit() {
+    gridInit () {
         const size = this.size
         const Grid = defineGrid(this.hex)
         const hsize = Math.floor(size / 2)
@@ -204,10 +201,3 @@ export default class Main {
         this.grid = grid.concat(grid1).concat(grid2).concat(grid3).concat(grid4).concat(grid5)
     }
 }
-
-
-
-
-
-
-
