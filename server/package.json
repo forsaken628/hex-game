@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "start": "pm2 start process.prod.json --no-daemon",
+    "dev": "nodemon --config nodemon.json app.js",
+    "initdb": "npm install && node tools/initdb.js"
+  },
+  "dependencies": {
+    "honeycomb-grid": "^1.3.5",
+    "ws": "^6.0.0"
+  }
+}

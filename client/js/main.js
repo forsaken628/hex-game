@@ -1,7 +1,7 @@
 import { Application, Graphics, Polygon } from './libs/pixi'
 import { defineGrid, extendHex } from './libs/honeycomb.min'
-
-const EventEmitter = require('./libs/EventEmitter')
+import Socket from './runtime/websocket'
+import EventEmitter from './libs/EventEmitter'
 
 function TouchCaster (el, graphics, camera) {
     this.el = el
@@ -130,11 +130,12 @@ TouchCaster.prototype.onTouchEnd = function (evt) {
 
 const bus = new EventEmitter()
 
+new Socket()
 /**
  * 游戏主函数
  */
 export default class Main {
-    constructor() {
+    constructor () {
         this.app = new Application({
             width: canvas.width,
             height: canvas.height,
@@ -193,7 +194,7 @@ export default class Main {
 
     }
 
-    draw(hex, color) {
+    draw (hex, color) {
         // let mod = false
         // if (!hex.color) {
         //     hex.color = PIXI.utils.rgb2hex([Math.random(), Math.random(), Math.random()])
@@ -230,7 +231,7 @@ export default class Main {
         //graphics.setTransform(x, y, zoom, zoom)
     }
 
-    gridInit() {
+    gridInit () {
         const size = this.size
         const Grid = defineGrid(this.hex)
         const hsize = Math.floor(size / 2)
