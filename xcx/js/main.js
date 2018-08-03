@@ -43,8 +43,8 @@ TouchCaster.prototype.onTouchStart = function (evt) {
         case 2:
             this.state = this.STATE.TOUCH_DOLLY
 
-            var dx = evt.touches[0].pageX - evt.touches[1].pageX
-            var dy = evt.touches[0].pageY - evt.touches[1].pageY
+            const dx = evt.touches[0].pageX - evt.touches[1].pageX
+            const dy = evt.touches[0].pageY - evt.touches[1].pageY
             this.dollyStart = Math.sqrt(dx * dx + dy * dy)
             break
         default:
@@ -76,9 +76,9 @@ TouchCaster.prototype.onTouchMove = function (evt) {
             if (this.state !== this.STATE.TOUCH_DOLLY)
                 return
 
-            var dx = evt.touches[0].pageX - evt.touches[1].pageX
-            var dy = evt.touches[0].pageY - evt.touches[1].pageY
-            var distance = Math.sqrt(dx * dx + dy * dy)
+            const dx = evt.touches[0].pageX - evt.touches[1].pageX
+            const dy = evt.touches[0].pageY - evt.touches[1].pageY
+            const distance = Math.sqrt(dx * dx + dy * dy)
 
             const dollyDelta = distance - this.dollyStart
 
@@ -134,7 +134,7 @@ const bus = new EventEmitter()
  * 游戏主函数
  */
 export default class Main {
-    constructor () {
+    constructor() {
         this.app = new Application({
             width: canvas.width,
             height: canvas.height,
@@ -154,7 +154,7 @@ export default class Main {
         this.camera = {
             x: 0,
             y: 0,
-            zoom: 3
+            zoom: 2
         }
 
         const caster = new TouchCaster(this.app.view, this.graphics, this.camera)
@@ -193,7 +193,7 @@ export default class Main {
 
     }
 
-    draw (hex, color) {
+    draw(hex, color) {
         // let mod = false
         // if (!hex.color) {
         //     hex.color = PIXI.utils.rgb2hex([Math.random(), Math.random(), Math.random()])
@@ -220,7 +220,7 @@ export default class Main {
         path.push(corners[0].x, corners[0].y)
 
         //if (zoom > 1) {
-        this.graphics.lineStyle(1 / this.camera.zoom, 0x999999)
+        this.graphics.lineStyle(1 / this.camera.zoom, 0x999999, 1, 0)
         //}
 
         //graphics.beginFill(hex.color)
@@ -230,7 +230,7 @@ export default class Main {
         //graphics.setTransform(x, y, zoom, zoom)
     }
 
-    gridInit () {
+    gridInit() {
         const size = this.size
         const Grid = defineGrid(this.hex)
         const hsize = Math.floor(size / 2)
