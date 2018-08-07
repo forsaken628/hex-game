@@ -1,8 +1,9 @@
 const game = require('../game')
 
 const route = require('koa-route')
-const {auth: {validation}} = require('../qcloud')
-const {LOGIN_STATE} = require('wafer-node-sdk/lib/constants')
+
+const {LOGIN_STATE} = require('../constants')
+const {validation} = require('../middlewares/auth')
 
 module.exports = route.get('/socket', async function (ctx) {
 
@@ -10,11 +11,8 @@ module.exports = route.get('/socket', async function (ctx) {
 
     if (loginState === LOGIN_STATE.FAILED) {
         //todo
-
         //ctx.websocket.close()
     }
-
-    console.log(userinfo)
 
     //ctx.websocket.send('Hello World')
     ctx.websocket.on('message', function (message) {

@@ -7,11 +7,13 @@ import Conn from './conn/index'
 export default class Main {
     constructor () {
 
-        //const conn = new Conn()
+
         //conn.login()
         //conn.pushCamera()
 
         const vis = new Visual()
+
+        vis.conn.fetchBase()
 
         // const interaction = this.app.renderer.plugins.interaction
         //

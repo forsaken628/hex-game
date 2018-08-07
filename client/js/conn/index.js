@@ -122,4 +122,28 @@ export default class Conn {
             })
         })
     }
+
+    fetchBase () {
+
+        return new Promise((resolve, reject) => {
+            qcloud.request({
+                url: 'http://127.0.0.1:8001/weapp/hexs/base',
+                //login: true,
+                success (result) {
+                    console.log(result.data)
+                    //util.showSuccess('登录成功')
+                    resolve(result.data.data)
+                    // that.isLogin = true
+                    // that.userInfo = result.data.data
+                },
+                fail (error) {
+                    //util.showModel('请求失败', error)
+                    reject(error)
+                    //console.log('request fail', error)
+                }
+            })
+
+        })
+
+    }
 }
