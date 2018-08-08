@@ -166,11 +166,12 @@ class Conn {
         })
     }
 
-    fetchHexs () {
+    fetchHexs (width, height, start) {
         return new Promise((resolve, reject) => {
             qcloud.request({
-                url: `http${tls}://${host}/weapp/hexs/find`,
+                url: `http${tls}://${host}/weapp/hexs/rectangle`,
                 method: 'post',
+                data: {width, height, start},
                 //login: true,
                 success (result) {
                     console.log(result.data)

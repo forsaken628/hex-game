@@ -39,7 +39,7 @@ export default class Visual {
             //console.log(hex)
             const color = msg.value.color
             hex.value.color = utils.rgb2hex([color.r, color.g, color.b])
-            this.draw(hex, hex.value.color)
+            this.drawOne(hex, hex.value.color)
 
             // setTimeout(() => {
             //     const hex = this.grid.Grid.Hex(msg.x, msg.y)
@@ -48,14 +48,14 @@ export default class Visual {
         })
 
         for (const hex of this.grid.hexs) {
-            this.draw(hex, 0x999999)
+            this.drawOne(hex, 0x999999)
         }
 
         this.setCamera(0, 0, 2)
         this.app.stage.addChild(this.graphics)
     }
 
-    draw (hex, color) {
+    drawOne (hex, color) {
         // let mod = false
         // if (!hex.color) {
         //     hex.color = PIXI.utils.rgb2hex([Math.random(), Math.random(), Math.random()])
@@ -102,26 +102,43 @@ export default class Visual {
 
         this.graphics.setTransform(camera.x, camera.y, camera.zoom, camera.zoom)
 
-        this.grid.fetchHexs().then(()=>{
-            for (const hex of this.grid.hexs) {
-                this.draw(hex, hex.value.color)
-            }
-        })
-
         const center = this.grid.pointToHex(
             (view.width / 2 - x) / zoom,
             (view.height / 2 - y) / zoom)
 
+        const offsetX = Math.floor(view.width / zoom / center.width())
+        const offsetY = Math.floor(view.height / zoom / center.height())
+
+        const start = this.grid.Grid.Hex({
+            x: center.x - offsetX,
+            y: center.y - offsetY
+        })
+
+        const end = this.grid.Grid.Hex({
+            x: center.x + offsetX,
+            y: center.y + offsetY
+        })
+
         if (!camera.center) {
             camera.center = center
             conn.pushCamera(center)
+            this.draw(start, end)
             return
         }
 
         if (center.distance(camera.center) > 10) {
             camera.center = center
             conn.pushCamera(center)
+            this.draw(start, end)
         }
+    }
+
+    draw (start, end) {
+        this.grid.fetchHexs(start, end).then(() => {
+            for (const hex of this.grid.hexs) {
+                this.drawOne(hex, hex.value.color)
+            }
+        })
     }
 
     //.pointToHex((evt.x - this.camera.x) / this.camera.zoom,
@@ -254,10 +271,12 @@ class TouchCaster {
             const hex = this.ctx.grid.pointToHex(
                 (evt.x - this.ctx.camera.x) / this.ctx.camera.zoom,
                 (evt.y - this.ctx.camera.y) / this.ctx.camera.zoom)
-            this.ctx.draw(hex, 0)
+            this.ctx.drawOne(hex, 0)
+
+            console.log(hex)
 
             setTimeout(() => {
-                this.ctx.draw(hex, 0x00ff00)
+                this.ctx.drawOne(hex, 0x00ff00)
             }, 1000)
             // bus.on('click', evt => {
 //     //todo

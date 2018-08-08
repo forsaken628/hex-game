@@ -43,8 +43,9 @@ export default class Grid {
         //.pointToHex((evt.x - this.camera.x) / this.camera.zoom, (evt.y - this.camera.y) / this.camera.zoom)
     }
 
-    async fetchHexs () {
-        const data = await conn.fetchHexs()
+    async fetchHexs (start, end) {
+
+        const data = await conn.fetchHexs(end.x - start.x, end.y - start.y, start)
 
         data.hexs.forEach(hex => {
             const color = hex.value.color

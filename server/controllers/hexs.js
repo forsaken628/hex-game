@@ -1,16 +1,16 @@
 const game = require('../game')
 const station = require('../res/station')
 
-exports.find = async ctx => {
-    //const data = ctx.request.body
-    const data = {
-        width: 5,
-        height: 10,
-        start: {
-            x: 0,
-            y: 0,
-        }
-    }
+exports.rectangle = async ctx => {
+    const data = ctx.request.body
+    // const data = {
+    //     width: 5,
+    //     height: 10,
+    //     start: {
+    //         x: 0,
+    //         y: 0,
+    //     }
+    // }
     const hexs = game.Grid.rectangle({
         width: data.width,
         height: data.height,

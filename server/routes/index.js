@@ -13,7 +13,7 @@ router.get('/login', authorizationMiddleware, controllers.login)
 
 router.put('/camera', validationMiddleware, controllers.camera)
 
-router.post('/hexs/find', validationMiddleware, controllers.hexs.find)
+router.post('/hexs/rectangle', validationMiddleware, controllers.hexs.rectangle)
 
 router.get('/hexs/base', validationMiddleware, controllers.hexs.base)
 
