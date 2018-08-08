@@ -1,5 +1,4 @@
 import Visual from './visual/index'
-import Conn from './conn/index'
 
 /**
  * 游戏主函数
@@ -13,7 +12,7 @@ export default class Main {
 
         const vis = new Visual()
 
-        vis.conn.fetchBase()
+        //conn.fetchBase()
 
         // const interaction = this.app.renderer.plugins.interaction
         //

@@ -6,17 +6,16 @@ const {LOGIN_STATE} = require('../constants')
 const {validation} = require('../middlewares/auth')
 
 module.exports = route.get('/socket', async function (ctx) {
-
-    const {loginState, userinfo} = await validation({headers: {'x-wx-skey': ctx.request.query.skey}})
+    const {loginState, userinfo, id} = await validation({headers: {'x-wx-skey': ctx.request.query.skey}})
 
     if (loginState === LOGIN_STATE.FAILED) {
         //todo
-        //ctx.websocket.close()
+        ctx.websocket.close()
     }
 
-    //ctx.websocket.send('Hello World')
+    game.sessions.checkSocket(id, ctx.websocket)// todo callback 踢线
+
     ctx.websocket.on('message', function (message) {
-        // do something with the message from client
         console.log(message)
     })
 
@@ -28,6 +27,6 @@ module.exports = route.get('/socket', async function (ctx) {
     game.Grid.EventEmitter.on('update', push)
     ctx.websocket.on('close', () => {
         game.Grid.EventEmitter.off('update', push)
+        game.sessions.clean(id)
     })
-
 })

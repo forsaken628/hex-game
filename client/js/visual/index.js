@@ -1,6 +1,6 @@
 import { Application, Graphics, Polygon, utils } from '../libs/pixi'
 import Grid from './grid'
-import Conn from '../conn/index'
+import conn from '../conn/index'
 
 let instance
 
@@ -20,8 +20,6 @@ export default class Visual {
 
         this.graphics = new Graphics()
 
-        this.conn = new Conn()
-
         this.camera = {
             x: 0,
             y: 0,
@@ -34,9 +32,9 @@ export default class Visual {
         this.caster = new TouchCaster(this)
 
         this.grid = new Grid(20)
-        //this.grid.init()
+        this.grid.init()
 
-        this.conn.EventEmitter.on('message', msg => {
+        conn.EventEmitter.on('message', msg => {
             const hex = this.grid.Grid.Hex(msg.x, msg.y)
             //console.log(hex)
             const color = msg.value.color
@@ -50,7 +48,7 @@ export default class Visual {
         })
 
         for (const hex of this.grid.hexs) {
-            this.draw(hex, 0x00ff00)
+            this.draw(hex, 0x999999)
         }
 
         this.setCamera(0, 0, 2)
@@ -104,19 +102,25 @@ export default class Visual {
 
         this.graphics.setTransform(camera.x, camera.y, camera.zoom, camera.zoom)
 
+        this.grid.fetchHexs().then(()=>{
+            for (const hex of this.grid.hexs) {
+                this.draw(hex, hex.value.color)
+            }
+        })
+
         const center = this.grid.pointToHex(
             (view.width / 2 - x) / zoom,
             (view.height / 2 - y) / zoom)
 
         if (!camera.center) {
             camera.center = center
-            this.conn.pushCamera(center)
+            conn.pushCamera(center)
             return
         }
 
         if (center.distance(camera.center) > 10) {
             camera.center = center
-            this.conn.pushCamera(center)
+            conn.pushCamera(center)
         }
     }
 
