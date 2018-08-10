@@ -3,23 +3,26 @@ const station = require('../res/station')
 
 exports.rectangle = async ctx => {
     const data = ctx.request.body
-    // const data = {
-    //     width: 5,
-    //     height: 10,
-    //     start: {
-    //         x: 0,
-    //         y: 0,
-    //     }
-    // }
-    const hexs = game.Grid.rectangle({
-        width: data.width,
-        height: data.height,
-        start: game.Grid.Hex(data.start.x, data.start.y)
-    })
 
     ctx.state.data = {}
-    ctx.state.data.hexs = hexs.filter(hex => game.Grid.hexs.includes(hex)).map(hex => game.Grid.hexs.get(hex))
 
+    let dist = []
+
+    for (const item of data) {
+
+        const hexs = game.Grid.rectangle({
+            width: item.width,
+            height: item.height,
+            start: game.Grid.Hex(item.start.x, item.start.y)
+        })
+
+        dist.push({
+            ceil: `${item.start.x},${item.start.y}`,
+            hexs: game.Grid.get(hexs)
+        })
+    }
+
+    ctx.state.data.ceils = dist
 }
 
 exports.base = async ctx => {

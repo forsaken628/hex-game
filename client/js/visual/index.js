@@ -31,7 +31,7 @@ export default class Visual {
 
         this.caster = new TouchCaster(this)
 
-        this.grid = new Grid(20)
+        this.grid = new Grid(40)
         this.grid.init()
 
         conn.EventEmitter.on('message', msg => {
@@ -106,8 +106,8 @@ export default class Visual {
             (view.width / 2 - x) / zoom,
             (view.height / 2 - y) / zoom)
 
-        const offsetX = Math.floor(view.width / zoom / center.width())
-        const offsetY = Math.floor(view.height / zoom / center.height())
+        const offsetX = Math.floor(view.width * 0.1 / zoom / center.width()) //todo
+        const offsetY = Math.floor(view.height * 0.1 / zoom / center.height()) // todo
 
         const start = this.grid.Grid.Hex({
             x: center.x - offsetX,
@@ -126,7 +126,7 @@ export default class Visual {
             return
         }
 
-        if (center.distance(camera.center) > 10) {
+        if (center.distance(camera.center) > 5) { //todo
             camera.center = center
             conn.pushCamera(center)
             this.draw(start, end)
@@ -140,12 +140,6 @@ export default class Visual {
             }
         })
     }
-
-    //.pointToHex((evt.x - this.camera.x) / this.camera.zoom,
-    // (evt.y - this.camera.y) / this.camera.zoom)
-    //const hex = defineGrid(this.hex).pointToHex((evt.x - this.camera.x)
-    // / this.camera.zoom, (evt.y - this.camera.y) / this.camera.zoom)
-
 }
 
 class TouchCaster {

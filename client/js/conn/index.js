@@ -5,8 +5,8 @@ import Session from '../libs/wafer2-client-sdk/lib/session'
 import EventEmitter from '../libs/EventEmitter'
 
 //const host = 'nftmahoo.qcloud.la'
-//const host = '127.0.0.1:5757'
-const host = '192.168.4.11:5757'
+const host = '127.0.0.1:5757'
+//const host = '192.168.4.11:5757'
 const tls = ''
 
 let instance
@@ -166,15 +166,14 @@ class Conn {
         })
     }
 
-    fetchHexs (width, height, start) {
+    fetchHexs (data) {
         return new Promise((resolve, reject) => {
             qcloud.request({
                 url: `http${tls}://${host}/weapp/hexs/rectangle`,
                 method: 'post',
-                data: {width, height, start},
+                data,
                 //login: true,
                 success (result) {
-                    console.log(result.data)
                     //util.showSuccess('登录成功')
                     resolve(result.data.data)
                     // that.isLogin = true

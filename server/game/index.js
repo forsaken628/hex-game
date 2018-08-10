@@ -10,64 +10,59 @@ const Grid = defineGrid(extendHex({
 }))
 Grid.EventEmitter = new EventEmitter()
 Grid.hexs = Grid()
+Grid.map = {}
 exports.Grid = Grid
 
 ;(function () {
-    const size = 20
+    const size = 40
 
     Grid.hexs = Grid.hexagon({
         radius: size,
         onCreate (hex) {
             hex.init()
-            const r = Math.floor(256 * Math.random())
-            const b = Math.floor(256 * Math.random())
-            const g = Math.floor(256 * Math.random())
-            hex.value.color = {r, g, b}
+
+            hex.value.color = rgb2hex([
+                (hex.q / 2 / size + 0.5),
+                (hex.r / 2 / size + 0.5),
+                (hex.s / 2 / size + 0.5)
+            ])
         }
     })
 
     Grid.hexs.forEach(hex => {
-        console.log(hex)
+        Grid.map[hex.y] = Grid.map[hex.y] || {}
+        Grid.map[hex.y][hex.x] = hex
     })
-
-    // const hsize = Math.floor(size / 2)
-    //
-    // let grid = Grid.triangle({start: Grid.Hex(0, 0), size, direction: 1})
-    // let grid1 = Grid.triangle({start: Grid.Hex(-size, -1), size, direction: 5})
-    // let grid2 = Grid.triangle({start: Grid.Hex(-size + 1, 0), size, direction: 1})
-    // let grid3 = Grid.triangle({start: Grid.Hex(-Math.floor((size - 1) / 2) - size, -size), size, direction: 5})
-    // let grid4 = Grid.triangle({start: Grid.Hex(-hsize, -size + 1), size, direction: 1})
-    // let grid5 = Grid.triangle({start: Grid.Hex(-Math.floor((size + 1) / 2), -size), size, direction: 5})
-    //
-    // for (const hex of grid) {
-    //     hexs.push(hex)
-    // }
-    // for (const hex of grid1) {
-    //     hexs.push(hex)
-    // }
-    // for (const hex of grid2) {
-    //     hexs.push(hex)
-    // }
-    // for (const hex of grid3) {
-    //     hexs.push(hex)
-    // }
-    // for (const hex of grid4) {
-    //     hexs.push(hex)
-    // }
-    // for (const hex of grid5) {
-    //     hexs.push(hex)
-    // }
 
 })()
 
+Grid.get = function (hexs) {
+    const dist = []
+
+    for (const hex of hexs) {
+        if (!this.map[hex.y]) {
+            continue
+        }
+
+        if (!this.map[hex.y][hex.x]) {
+            continue
+        }
+
+        dist.push(this.map[hex.y][hex.x])
+    }
+
+    return dist
+}
+
+function rgb2hex (rgb) {
+    return (rgb[0] * 255 << 16) + (rgb[1] * 255 << 8) + (rgb[2] * 255 | 0)
+}
+
 setInterval(() => {
     return
-    const r = Math.floor(256 * Math.random())
-    const b = Math.floor(256 * Math.random())
-    const g = Math.floor(256 * Math.random())
 
     const hex = Grid.hexs[Math.floor(Math.random() * Grid.hexs.length)]
-    hex.value.color = {r, b, g}
+    hex.value.color = rgb2hex([Math.random(), Math.random(), Math.random()])
     Grid.EventEmitter.emit('update', hex)
 }, 2000)
 

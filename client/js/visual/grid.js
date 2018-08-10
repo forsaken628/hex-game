@@ -1,6 +1,7 @@
 import { defineGrid, extendHex } from '../libs/honeycomb/index'
-import { utils } from '../libs/pixi'
 import conn from '../conn/index'
+
+const CEIL_SIZE = 5 //todo
 
 export default class Grid {
     constructor (size) {
@@ -13,6 +14,7 @@ export default class Grid {
             },
         }))
         this.hexs = this.Grid()
+        this.ceil = {}
     }
 
     init () {
@@ -44,12 +46,46 @@ export default class Grid {
     }
 
     async fetchHexs (start, end) {
+        const ceils = this.ceils2Fetch(start, end)
+        if (!ceils.length)
+            return
 
-        const data = await conn.fetchHexs(end.x - start.x, end.y - start.y, start)
+        const data = await conn.fetchHexs(ceils)
 
-        data.hexs.forEach(hex => {
-            const color = hex.value.color
-            this.hexs.get(hex).value.color = utils.rgb2hex([color.r, color.g, color.b])
+        data.ceils.forEach(ceil => {
+            this.ceil[ceil.ceil] = true
+
+            ceil.hexs.forEach(hex => {
+                this.hexs.get(hex).value = hex.value
+            })
         })
+    }
+
+    ceils2Fetch (start, end) {
+        const startCeil = {
+            x: Math.floor(start.x / CEIL_SIZE) * CEIL_SIZE,
+            y: Math.floor(start.y / CEIL_SIZE) * CEIL_SIZE,
+        }
+
+        const endCeil = {
+            x: Math.ceil(end.x / CEIL_SIZE) * CEIL_SIZE,
+            y: Math.ceil(end.y / CEIL_SIZE) * CEIL_SIZE,
+        }
+
+        const dist = []
+
+        for (let i = startCeil.y; i <= endCeil.y; i += CEIL_SIZE) {
+            for (let j = startCeil.x; j <= endCeil.x; j += CEIL_SIZE) {
+                if (!this.ceil[`${j},${i}`]) {
+                    dist.push({
+                        height: CEIL_SIZE,
+                        width: CEIL_SIZE,
+                        start: {x: j, y: i},
+                    })
+                }
+            }
+        }
+
+        return dist
     }
 }
