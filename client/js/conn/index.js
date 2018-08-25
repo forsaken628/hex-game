@@ -189,4 +189,4 @@ class Conn {
     }
 }
 
-export default new Conn()
+export default Conn

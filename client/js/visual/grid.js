@@ -1,10 +1,12 @@
-import { defineGrid, extendHex } from '../libs/honeycomb/index'
-import conn from '../conn/index'
+import { defineGrid, extendHex, Point } from '../libs/honeycomb/index'
+import Conn from '../conn/index'
 
-const CEIL_SIZE = 5 //todo
+const CEIL_SIZE = 10
 
 export default class Grid {
     constructor (size) {
+        this.conn = new Conn()
+
         this.size = size
         this.Grid = defineGrid(extendHex({
             size: 10,
@@ -14,6 +16,8 @@ export default class Grid {
             },
         }))
         this.hexs = this.Grid()
+        this.hexsCache = {}
+
         this.ceil = {}
     }
 
@@ -28,21 +32,18 @@ export default class Grid {
             },
         })
 
-        // const hsize = Math.floor(size / 2)
-        //
-        // let grid = Grid.triangle({start: Grid.Hex(0, 0), size, direction: 1})
-        // let grid1 = Grid.triangle({start: Grid.Hex(-size, -1), size, direction: 5})
-        // let grid2 = Grid.triangle({start: Grid.Hex(-size + 1, 0), size, direction: 1})
-        // let grid3 = Grid.triangle({start: Grid.Hex(-Math.floor((size - 1) / 2) - size, -size), size, direction: 5})
-        // let grid4 = Grid.triangle({start: Grid.Hex(-hsize, -size + 1), size, direction: 1})
-        // let grid5 = Grid.triangle({start: Grid.Hex(-Math.floor((size + 1) / 2), -size), size, direction: 5})
-        //
-        // this.hexs = grid.concat(grid1).concat(grid2).concat(grid3).concat(grid4).concat(grid5)
+        for (const hex of this.hexs) {
+            this.hexsCache[`${hex.x},${hex.y}`] = hex
+        }
     }
 
-    pointToHex (x, y) {
-        return this.Grid.pointToHex(x, y)
-        //.pointToHex((evt.x - this.camera.x) / this.camera.zoom, (evt.y - this.camera.y) / this.camera.zoom)
+    pointToHex () {
+        return this.get(this.Grid.pointToHex.apply(this, arguments))
+    }
+
+    get (hex) {
+        hex = Point(hex)
+        return this.hexsCache[`${hex.x},${hex.y}`]
     }
 
     async fetchHexs (start, end) {
@@ -50,13 +51,13 @@ export default class Grid {
         if (!ceils.length)
             return
 
-        const data = await conn.fetchHexs(ceils)
+        const data = await this.conn.fetchHexs(ceils)
 
         data.ceils.forEach(ceil => {
             this.ceil[ceil.ceil] = true
 
-            ceil.hexs.forEach(hex => {
-                this.hexs.get(hex).value = hex.value
+            ceil.hexs.forEach(p => {
+                this.get(p).value = p.value
             })
         })
     }

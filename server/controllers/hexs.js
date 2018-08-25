@@ -9,16 +9,9 @@ exports.rectangle = async ctx => {
     let dist = []
 
     for (const item of data) {
-
-        const hexs = game.Grid.rectangle({
-            width: item.width,
-            height: item.height,
-            start: game.Grid.Hex(item.start.x, item.start.y)
-        })
-
         dist.push({
             ceil: `${item.start.x},${item.start.y}`,
-            hexs: game.Grid.get(hexs)
+            hexs: game.Grid.getCeil(item.start)
         })
     }
 

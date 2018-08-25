@@ -1,6 +1,8 @@
 const {extendHex, defineGrid} = require('honeycomb-grid')
 const EventEmitter = require('events')
 
+const CEIL_SIZE = 10
+
 const Grid = defineGrid(extendHex({
     size: 10,
     value: null,
@@ -11,7 +13,7 @@ const Grid = defineGrid(extendHex({
 Grid.EventEmitter = new EventEmitter()
 Grid.hexs = Grid()
 Grid.map = {}
-exports.Grid = Grid
+Grid.ceils = {}
 
 ;(function () {
     const size = 40
@@ -34,6 +36,35 @@ exports.Grid = Grid
         Grid.map[hex.y][hex.x] = hex
     })
 
+    // ceils2Fetch (start, end) {
+    //     const startCeil = {
+    //         x: Math.floor(start.x / CEIL_SIZE) * CEIL_SIZE,
+    //         y: Math.floor(start.y / CEIL_SIZE) * CEIL_SIZE,
+    //     }
+    //
+    //     const endCeil = {
+    //         x: Math.ceil(end.x / CEIL_SIZE) * CEIL_SIZE,
+    //         y: Math.ceil(end.y / CEIL_SIZE) * CEIL_SIZE,
+    //     }
+    //
+    //     const dist = []
+    //
+    //     for (let i = startCeil.y; i <= endCeil.y; i += CEIL_SIZE) {
+    //         for (let j = startCeil.x; j <= endCeil.x; j += CEIL_SIZE) {
+    //             if (!this.ceil[`${j},${i}`]) {
+    //                 dist.push({
+    //                     height: CEIL_SIZE,
+    //                     width: CEIL_SIZE,
+    //                     start: {x: j, y: i},
+    //                 })
+    //             }
+    //         }
+    //     }
+    //
+    //     return dist
+    // }
+    //
+
 })()
 
 Grid.get = function (hexs) {
@@ -52,6 +83,16 @@ Grid.get = function (hexs) {
     }
 
     return dist
+}
+
+Grid.getCeil = function (start) {
+    const hexs = Grid.rectangle({
+        width: CEIL_SIZE,
+        height: CEIL_SIZE,
+        start: Grid.Hex(start.x, start.y)
+    })
+
+    return Grid.get(hexs)
 }
 
 function rgb2hex (rgb) {
@@ -105,4 +146,6 @@ sessions.clean = function (id) {
     delete sessions[id]
 }
 
+exports.Grid = Grid
 exports.sessions = sessions
+exports.CEIL_SIZE = CEIL_SIZE
